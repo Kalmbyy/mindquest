@@ -1,4 +1,4 @@
-# MindQuest 🎮💪
+# MindQuest 
 
 > Gamifikasi Rutinitas Hidup Sehat Harian
 > Dicoding Bootcamp Batch 11 — Capstone Project — Tim DB11-G006

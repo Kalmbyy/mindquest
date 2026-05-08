@@ -53,8 +53,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Basic user info (used in nested responses)."""
-    profile = UserProfileSerializer(read_only=True)
+    profile = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'profile')
+
+    def get_profile(self, obj):
+        try:
+            return UserProfileSerializer(obj.profile).data
+        except Exception:
+            return None

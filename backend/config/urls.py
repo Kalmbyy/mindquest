@@ -6,9 +6,11 @@ from django.urls import path, include
 from drf_spectacular.views import (
     SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 )
+from .views import health_check
 
 
 urlpatterns = [
+    path('', health_check, name='health-check'),
     path('admin/', admin.site.urls),
 
     # API endpoints
