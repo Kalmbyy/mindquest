@@ -3,9 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply font-sans antialiased text-slate-800 bg-slate-50;
-  }
+  body { @apply font-sans antialiased text-slate-800 bg-slate-50; }
 }
 
 @layer components {
@@ -23,7 +21,5 @@
            focus:ring-2 focus:ring-primary-400 focus:border-primary-400
            outline-none transition-colors;
   }
-  .card {
-    @apply bg-white rounded-xl border border-slate-200 p-5 shadow-sm;
-  }
+  .card { @apply bg-white rounded-xl border border-slate-200 p-5 shadow-sm; }
 }

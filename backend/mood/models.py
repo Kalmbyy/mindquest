@@ -6,7 +6,6 @@ from django.utils import timezone
 
 class MoodLog(models.Model):
     """Daily mood + energy check-in (1-5 scale)."""
-
     SCORE_CHOICES = [(i, str(i)) for i in range(1, 6)]
 
     user = models.ForeignKey(
@@ -15,12 +14,10 @@ class MoodLog(models.Model):
         related_name='mood_logs'
     )
     mood_score = models.PositiveSmallIntegerField(
-        choices=SCORE_CHOICES,
-        help_text="1=sangat buruk, 5=sangat baik"
+        choices=SCORE_CHOICES, help_text="1=sangat buruk, 5=sangat baik"
     )
     energy_score = models.PositiveSmallIntegerField(
-        choices=SCORE_CHOICES,
-        help_text="1=sangat lelah, 5=sangat bertenaga"
+        choices=SCORE_CHOICES, help_text="1=sangat lelah, 5=sangat bertenaga"
     )
     note = models.TextField(blank=True, max_length=500)
     log_date = models.DateField(default=timezone.localdate)

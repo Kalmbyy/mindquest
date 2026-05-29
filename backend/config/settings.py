@@ -1,11 +1,13 @@
 """
 Django settings for MindQuest project.
-Generated for Dicoding Bootcamp Batch 11 Capstone — DB11-G006
+Dicoding Bootcamp Batch 11 Capstone — DB11-G006
+Production-ready: supports SQLite (dev) and PostgreSQL via DATABASE_URL (prod).
 """
 
 from pathlib import Path
 from datetime import timedelta
 import os
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,6 +17,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-me')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Allow all Railway/Render subdomains in production
+ALLOWED_HOSTS += ['.railway.app', '.onrender.com', '.up.railway.app']
 
 
 INSTALLED_APPS = [
@@ -35,6 +40,7 @@ INSTALLED_APPS = [
     'users',
     'quests',
     'mood',
+    'badges',
 ]
 
 MIDDLEWARE = [
@@ -70,17 +76,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database — default SQLite for dev, switch to PostgreSQL for production
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# ── Database ──────────────────────────────────────────────────────────
+# Uses DATABASE_URL (PostgreSQL) if set, else falls back to SQLite.
+DATABASE_URL = os.getenv('DATABASE_URL', '')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-}
-
-# To use PostgreSQL, uncomment below and set DATABASE_URL in .env:
-# import dj_database_url
-# DATABASES['default'] = dj_database_url.parse(os.getenv('DATABASE_URL'))
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 AUTH_USER_MODEL = 'users.User'
@@ -106,7 +115,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# REST Framework
+# ── REST Framework ────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -119,7 +128,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-# JWT settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -128,7 +136,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Swagger / OpenAPI
 SPECTACULAR_SETTINGS = {
     'TITLE': 'MindQuest API',
     'DESCRIPTION': 'Gamified daily healthy living routine tracker — Dicoding Capstone DB11-G006',
@@ -136,9 +143,30 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-# CORS
-CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:5173,http://localhost:3000'
-).split(',')
+
+# ── CORS ──────────────────────────────────────────────────────────────
+CORS_ALLOWED_ORIGINS = [
+    o.strip() for o in os.getenv(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://localhost:3000'
+    ).split(',') if o.strip()
+]
+# Allow Vercel preview/production deployments
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://.*\.vercel\.app$',
+]
 CORS_ALLOW_CREDENTIALS = True
+
+
+# ── Security (production) ─────────────────────────────────────────────
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False  # Railway/Render handle SSL termination
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = [
+        'https://*.railway.app',
+        'https://*.up.railway.app',
+        'https://*.onrender.com',
+        'https://*.vercel.app',
+    ]

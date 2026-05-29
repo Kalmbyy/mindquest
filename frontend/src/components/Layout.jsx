@@ -1,15 +1,20 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Target, LogOut, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Target, History, Trophy, Award, LogOut, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+
+const NAV_ITEMS = [
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/quests', label: 'Quests', icon: Target },
+  { to: '/history', label: 'Riwayat', icon: History },
+  { to: '/leaderboard', label: 'Peringkat', icon: Trophy },
+  { to: '/badges', label: 'Badge', icon: Award },
+];
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -23,47 +28,36 @@ export default function Layout({ children }) {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink to="/dashboard" className={({ isActive }) =>
-              `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-100'
-              }`
-            }>
-              <LayoutDashboard className="w-4 h-4" /> Dashboard
-            </NavLink>
-            <NavLink to="/quests" className={({ isActive }) =>
-              `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
-                isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-100'
-              }`
-            }>
-              <Target className="w-4 h-4" /> Quests
-            </NavLink>
+            {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+              <NavLink key={to} to={to} className={({ isActive }) =>
+                `px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
+                  isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }>
+                <Icon className="w-4 h-4" /> {label}
+              </NavLink>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-600 hidden sm:inline">
               Hi, <span className="font-medium">{user?.username}</span>
             </span>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-red-600"
-              title="Logout"
-            >
+            <button onClick={handleLogout}
+              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-red-600" title="Logout">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <nav className="md:hidden border-t border-slate-100 px-4 py-2 flex gap-1">
-          <NavLink to="/dashboard" className={({ isActive }) =>
-            `flex-1 text-center py-2 rounded-lg text-sm font-medium ${
-              isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600'
-            }`
-          }>Dashboard</NavLink>
-          <NavLink to="/quests" className={({ isActive }) =>
-            `flex-1 text-center py-2 rounded-lg text-sm font-medium ${
-              isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600'
-            }`
-          }>Quests</NavLink>
+        <nav className="md:hidden border-t border-slate-100 px-2 py-2 flex gap-1 overflow-x-auto">
+          {NAV_ITEMS.map(({ to, label }) => (
+            <NavLink key={to} to={to} className={({ isActive }) =>
+              `flex-1 text-center py-2 px-2 rounded-lg text-xs font-medium whitespace-nowrap ${
+                isActive ? 'bg-primary-50 text-primary-600' : 'text-slate-600'
+              }`
+            }>{label}</NavLink>
+          ))}
         </nav>
       </header>
 

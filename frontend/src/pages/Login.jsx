@@ -18,9 +18,7 @@ export default function Login() {
       navigate('/dashboard');
     } catch (e) {
       setError(e.response?.data?.detail || 'Username atau password salah.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -33,37 +31,23 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-slate-900">MindQuest</h1>
           <p className="text-slate-600 mt-1">Selamat datang kembali, hero!</p>
         </div>
-
         <form onSubmit={handleSubmit} className="card space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
-            <input
-              type="text" required className="input-field"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              placeholder="username kamu"
-            />
+            <input type="text" required className="input-field" value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="username kamu" />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
-            <input
-              type="password" required className="input-field"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="••••••••"
-            />
+            <input type="password" required className="input-field" value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="••••••••" />
           </div>
           {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</p>}
-
           <button type="submit" disabled={loading} className="btn-primary w-full">
             {loading ? 'Sedang masuk...' : 'Masuk'}
           </button>
-
           <p className="text-center text-sm text-slate-600">
-            Belum punya akun?{' '}
-            <Link to="/register" className="text-primary-600 font-medium hover:underline">
-              Daftar gratis
-            </Link>
+            Belum punya akun? <Link to="/register" className="text-primary-600 font-medium hover:underline">Daftar gratis</Link>
           </p>
         </form>
       </div>

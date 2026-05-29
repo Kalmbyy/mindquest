@@ -58,3 +58,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'profile')
+
+
+class LeaderboardEntrySerializer(serializers.ModelSerializer):
+    """A single row in the leaderboard."""
+    username = serializers.CharField(source='user.username', read_only=True)
+    rank = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ('rank', 'username', 'total_xp', 'current_level', 'best_streak')

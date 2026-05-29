@@ -36,6 +36,5 @@ class MoodHistoryView(generics.ListAPIView):
     def get_queryset(self):
         seven_days_ago = timezone.localdate() - timedelta(days=7)
         return MoodLog.objects.filter(
-            user=self.request.user,
-            log_date__gte=seven_days_ago
+            user=self.request.user, log_date__gte=seven_days_ago
         )

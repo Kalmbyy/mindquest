@@ -12,10 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+    if (!token) { setLoading(false); return; }
     authAPI.me()
       .then((res) => setUser(res.data))
       .catch(() => localStorage.clear())
@@ -39,10 +36,7 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
-  const logout = () => {
-    localStorage.clear();
-    setUser(null);
-  };
+  const logout = () => { localStorage.clear(); setUser(null); };
 
   const refreshUser = async () => {
     const me = await authAPI.me();

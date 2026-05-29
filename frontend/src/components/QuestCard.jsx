@@ -1,5 +1,5 @@
-import * as Icons from 'lucide-react';
 import { Check } from 'lucide-react';
+import { getIcon } from '../utils/icons';
 
 const DIFFICULTY_STYLES = {
   EASY: 'bg-green-50 text-green-700 border-green-200',
@@ -16,28 +16,20 @@ const CATEGORY_STYLES = {
   DIGITAL: 'bg-slate-100 text-slate-700',
 };
 
-function getIcon(name) {
-  const pascalName = name?.split('-').map(s => s[0]?.toUpperCase() + s.slice(1)).join('') || 'Star';
-  return Icons[pascalName] || Icons.Star;
-}
-
 export default function QuestCard({ quest, onComplete, completing }) {
   const Icon = getIcon(quest.icon);
   const completed = quest.is_completed_today;
 
   return (
-    <div
-      className={`card transition-all ${
-        completed ? 'opacity-60 bg-slate-50' : 'hover:shadow-md hover:border-primary-200'
-      }`}
-    >
+    <div className={`card transition-all ${
+      completed ? 'opacity-60 bg-slate-50' : 'hover:shadow-md hover:border-primary-200'
+    }`}>
       <div className="flex items-start gap-3">
         <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
           CATEGORY_STYLES[quest.category] || 'bg-slate-100 text-slate-700'
         }`}>
           {completed ? <Check className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
         </div>
-
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h3 className={`font-semibold text-slate-900 ${completed ? 'line-through' : ''}`}>
@@ -47,9 +39,7 @@ export default function QuestCard({ quest, onComplete, completing }) {
               +{quest.xp_reward} XP
             </span>
           </div>
-
           <p className="text-sm text-slate-600 mb-3 leading-relaxed">{quest.description}</p>
-
           <div className="flex items-center gap-2 mb-3">
             <span className={`text-xs px-2 py-0.5 rounded-md border ${DIFFICULTY_STYLES[quest.difficulty]}`}>
               {quest.difficulty_display}
@@ -58,7 +48,6 @@ export default function QuestCard({ quest, onComplete, completing }) {
               {quest.category_display}
             </span>
           </div>
-
           <button
             onClick={() => onComplete(quest.id)}
             disabled={completed || completing}

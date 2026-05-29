@@ -57,7 +57,6 @@ class UserQuestLog(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        # Prevent the same user completing the same quest twice in one day
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'quest', 'completed_date'],

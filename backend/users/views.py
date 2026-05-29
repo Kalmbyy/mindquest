@@ -1,11 +1,13 @@
-"""Views for users app — register, login, profile."""
+"""Views for users app — register, profile, leaderboard."""
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from .models import UserProfile
 from .serializers import (
-    RegisterSerializer, UserProfileSerializer, UserSerializer
+    RegisterSerializer, UserProfileSerializer, UserSerializer,
+    LeaderboardEntrySerializer,
 )
 
 
@@ -46,3 +48,30 @@ class CurrentUserView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class LeaderboardView(APIView):
+    """GET /api/leaderboard/ — top 50 users by XP + current user's rank."""
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        profiles = list(
+            UserProfile.objects.select_related('user').order_by('-total_xp', 'user__username')
+        )
+
+        # Build ranked entries
+        entries = []
+        my_rank = None
+        for idx, profile in enumerate(profiles, start=1):
+            profile.rank = idx
+            if profile.user_id == request.user.id:
+                my_rank = idx
+            if idx <= 50:
+                entries.append(profile)
+
+        serializer = LeaderboardEntrySerializer(entries, many=True)
+        return Response({
+            'leaderboard': serializer.data,
+            'my_rank': my_rank,
+            'total_players': len(profiles),
+        })

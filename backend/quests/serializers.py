@@ -38,11 +38,14 @@ class UserQuestLogSerializer(serializers.ModelSerializer):
     """Read-only serializer for quest history."""
     quest_title = serializers.CharField(source='quest.title', read_only=True)
     quest_icon = serializers.CharField(source='quest.icon', read_only=True)
+    quest_category = serializers.CharField(
+        source='quest.get_category_display', read_only=True
+    )
 
     class Meta:
         model = UserQuestLog
         fields = (
-            'id', 'quest', 'quest_title', 'quest_icon',
+            'id', 'quest', 'quest_title', 'quest_icon', 'quest_category',
             'completed_date', 'xp_earned', 'created_at'
         )
         read_only_fields = fields

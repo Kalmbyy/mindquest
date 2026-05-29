@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Target, ArrowRight } from 'lucide-react';
+import { TrendingUp, Target, ArrowRight, Smile } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import Layout from '../components/Layout';
 import XPBar from '../components/XPBar';
@@ -23,7 +23,7 @@ export default function Dashboard() {
       ]);
       setProfile(p.data);
       setStats(s.data);
-      setMoodHistory(m.data.reverse());
+      setMoodHistory([...m.data].reverse());
     } catch (e) {
       console.error('Failed to load dashboard:', e);
     } finally {
@@ -43,6 +43,10 @@ export default function Dashboard() {
     Energi: m.energy_score,
   }));
 
+  const avgMood = moodHistory.length
+    ? (moodHistory.reduce((sum, m) => sum + m.mood_score, 0) / moodHistory.length).toFixed(1)
+    : '–';
+
   return (
     <Layout>
       <div className="mb-6">
@@ -60,7 +64,7 @@ export default function Dashboard() {
         <StreakCounter current={profile.current_streak} best={profile.best_streak} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="card">
           <div className="flex items-center gap-2 mb-2">
             <Target className="w-4 h-4 text-primary-600" />
@@ -81,10 +85,21 @@ export default function Dashboard() {
           <p className="text-xs text-slate-500 mt-1">Total: {profile.total_xp} XP</p>
         </div>
 
+        <div className="card">
+          <div className="flex items-center gap-2 mb-2">
+            <Smile className="w-4 h-4 text-warm-400" />
+            <p className="text-xs text-slate-500">Mood rata-rata</p>
+          </div>
+          <p className="text-2xl font-semibold text-slate-900">
+            {avgMood}<span className="text-sm text-slate-400 font-normal"> / 5</span>
+          </p>
+          <p className="text-xs text-slate-500 mt-1">7 hari terakhir</p>
+        </div>
+
         <Link to="/quests" className="card hover:border-primary-300 transition-colors flex items-center justify-between group">
           <div>
-            <p className="text-xs text-slate-500">Lanjutkan quest</p>
-            <p className="text-base font-semibold text-slate-900 mt-1">Lihat semua misi →</p>
+            <p className="text-xs text-slate-500">Lanjutkan</p>
+            <p className="text-base font-semibold text-slate-900 mt-1">Quest →</p>
           </div>
           <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
         </Link>
@@ -95,7 +110,7 @@ export default function Dashboard() {
           <h3 className="font-semibold text-slate-900 mb-1">Tren mood & energi</h3>
           <p className="text-sm text-slate-500 mb-4">7 hari terakhir</p>
           {chartData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-slate-400 text-sm">
+            <div className="h-48 flex items-center justify-center text-slate-400 text-sm text-center px-4">
               Belum ada data mood. Lakukan check-in pertamamu di samping →
             </div>
           ) : (
@@ -106,8 +121,8 @@ export default function Dashboard() {
                 <YAxis domain={[0, 5]} tick={{ fontSize: 12, fill: '#64748b' }} />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="Mood" stroke="#7F77DD" strokeWidth={2} />
-                <Line type="monotone" dataKey="Energi" stroke="#1D9E75" strokeWidth={2} />
+                <Line type="monotone" dataKey="Mood" stroke="#7F77DD" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="Energi" stroke="#1D9E75" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           )}

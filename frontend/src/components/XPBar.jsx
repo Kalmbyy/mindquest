@@ -15,12 +15,9 @@ export default function XPBar({ level, currentXP, neededXP, percent }) {
         </div>
         <div className="text-right">
           <p className="text-xs text-slate-500">Progress</p>
-          <p className="text-sm font-medium text-primary-600">
-            {currentXP} / {neededXP} XP
-          </p>
+          <p className="text-sm font-medium text-primary-600">{currentXP} / {neededXP} XP</p>
         </div>
       </div>
-
       <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"

@@ -8,6 +8,7 @@ from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
 from .models import Quest, UserQuestLog
 from .serializers import QuestSerializer, UserQuestLogSerializer
+from badges.services import check_and_award_badges
 
 
 class TodayQuestListView(generics.ListAPIView):
@@ -29,7 +30,6 @@ class CompleteQuestView(APIView):
         quest = get_object_or_404(Quest, id=quest_id, is_active=True)
         today = timezone.localdate()
 
-        # Try to create the log — unique constraint prevents duplicates
         try:
             log = UserQuestLog.objects.create(
                 user=request.user,
@@ -43,16 +43,19 @@ class CompleteQuestView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Award XP and update streak atomically
         profile = request.user.profile
         leveled_up = profile.add_xp(quest.xp_reward)
         profile.update_streak()
         profile.refresh_from_db()
 
+        # Check for newly unlocked badges
+        new_badges = check_and_award_badges(request.user)
+
         return Response({
             'message': f'Quest "{quest.title}" selesai! +{quest.xp_reward} XP',
             'leveled_up': leveled_up,
             'new_level': profile.current_level if leveled_up else None,
+            'new_badges': new_badges,
             'profile': {
                 'total_xp': profile.total_xp,
                 'current_level': profile.current_level,
@@ -70,7 +73,9 @@ class QuestHistoryView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return UserQuestLog.objects.filter(user=self.request.user)
+        return UserQuestLog.objects.filter(
+            user=self.request.user
+        ).select_related('quest')
 
 
 class TodayCompletionStatsView(APIView):
@@ -80,14 +85,11 @@ class TodayCompletionStatsView(APIView):
     def get(self, request):
         today = timezone.localdate()
         total_active = Quest.objects.filter(is_active=True).count()
-        completed_today = UserQuestLog.objects.filter(
+        logs_today = UserQuestLog.objects.filter(
             user=request.user, completed_date=today
-        ).count()
-        xp_today = sum(
-            UserQuestLog.objects.filter(
-                user=request.user, completed_date=today
-            ).values_list('xp_earned', flat=True)
         )
+        completed_today = logs_today.count()
+        xp_today = sum(logs_today.values_list('xp_earned', flat=True))
 
         return Response({
             'date': today,

@@ -10,19 +10,14 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ── Request interceptor: attach access token ─────────────────────────
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// ── Response interceptor: auto-refresh on 401 ────────────────────────
 let isRefreshing = false;
 let queue = [];
-
 const processQueue = (error, token = null) => {
   queue.forEach((p) => (error ? p.reject(error) : p.resolve(token)));
   queue = [];
@@ -32,7 +27,6 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
-
     if (error.response?.status === 401 && !original._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -42,24 +36,19 @@ api.interceptors.response.use(
           return api(original);
         });
       }
-
       original._retry = true;
       isRefreshing = true;
       const refresh = localStorage.getItem('refresh_token');
-
       if (!refresh) {
         localStorage.clear();
         window.location.href = '/login';
         return Promise.reject(error);
       }
-
       try {
         const res = await axios.post(`${API_BASE_URL}/auth/refresh/`, { refresh });
         const newAccess = res.data.access;
         localStorage.setItem('access_token', newAccess);
-        if (res.data.refresh) {
-          localStorage.setItem('refresh_token', res.data.refresh);
-        }
+        if (res.data.refresh) localStorage.setItem('refresh_token', res.data.refresh);
         api.defaults.headers.Authorization = `Bearer ${newAccess}`;
         original.headers.Authorization = `Bearer ${newAccess}`;
         processQueue(null, newAccess);
@@ -73,12 +62,10 @@ api.interceptors.response.use(
         isRefreshing = false;
       }
     }
-
     return Promise.reject(error);
   }
 );
 
-// ── API endpoints ────────────────────────────────────────────────────
 export const authAPI = {
   register: (data) => api.post('/auth/register/', data),
   login: (data) => api.post('/auth/login/', data),
@@ -89,13 +76,21 @@ export const authAPI = {
 export const questAPI = {
   today: () => api.get('/quests/today/'),
   todayStats: () => api.get('/quests/today-stats/'),
-  history: () => api.get('/quests/history/'),
+  history: (page = 1) => api.get(`/quests/history/?page=${page}`),
   complete: (id) => api.post(`/quests/${id}/complete/`),
 };
 
 export const moodAPI = {
   create: (data) => api.post('/mood/', data),
   history: () => api.get('/mood/history/'),
+};
+
+export const badgeAPI = {
+  list: () => api.get('/badges/'),
+};
+
+export const leaderboardAPI = {
+  get: () => api.get('/leaderboard/'),
 };
 
 export default api;

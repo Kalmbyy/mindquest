@@ -1,6 +1,4 @@
-"""
-Models for users app — Custom User and UserProfile (gamification stats).
-"""
+"""Models for users app — Custom User and UserProfile (gamification stats)."""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
@@ -18,10 +16,7 @@ class User(AbstractUser):
 
 
 class UserProfile(models.Model):
-    """
-    Gamification stats per user.
-    Auto-created via signal when User is created.
-    """
+    """Gamification stats per user. Auto-created via signal."""
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='profile'
     )
@@ -37,6 +32,7 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = 'User Profile'
         verbose_name_plural = 'User Profiles'
+        ordering = ['-total_xp']
 
     def __str__(self):
         return f"{self.user.username} — Level {self.current_level}"
@@ -70,7 +66,7 @@ class UserProfile(models.Model):
             'percent': round((xp_in_level / xp_needed) * 100, 1) if xp_needed > 0 else 100,
         }
 
-    def add_xp(self, amount: int):
+    def add_xp(self, amount: int) -> bool:
         """Add XP and recalculate level. Returns True if leveled up."""
         old_level = self.current_level
         self.total_xp += amount
@@ -80,23 +76,17 @@ class UserProfile(models.Model):
 
     # ── STREAK LOGIC ───────────────────────────────────────────────────
     def update_streak(self):
-        """
-        Update streak based on activity.
-        Called when user completes any quest.
-        """
+        """Update streak based on activity. Called on quest completion."""
         today = timezone.localdate()
 
         if self.last_activity_date is None:
             self.current_streak = 1
         elif self.last_activity_date == today:
-            # Already counted today, no change
-            return
+            return  # Already counted today
         elif (today - self.last_activity_date).days == 1:
-            # Consecutive day
-            self.current_streak += 1
+            self.current_streak += 1  # Consecutive day
         else:
-            # Streak broken
-            self.current_streak = 1
+            self.current_streak = 1  # Streak broken
 
         if self.current_streak > self.best_streak:
             self.best_streak = self.current_streak

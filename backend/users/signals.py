@@ -9,6 +9,5 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """Auto-create profile for new users."""
     if created:
         UserProfile.objects.create(user=instance)
