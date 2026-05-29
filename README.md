@@ -22,7 +22,7 @@ MindQuest adalah aplikasi web full-stack yang mengubah kebiasaan self-care haria
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 **Backend:** Django 4.2 · Django REST Framework · SimpleJWT · PostgreSQL/SQLite · drf-spectacular
 **Frontend:** React 18 · Vite · Tailwind CSS · Axios · React Router · Recharts
@@ -32,7 +32,7 @@ MindQuest adalah aplikasi web full-stack yang mengubah kebiasaan self-care haria
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Backend
 ```bash
@@ -60,7 +60,7 @@ Frontend: `http://localhost:5173`
 
 ---
 
-## 🧪 Menjalankan Test
+##  Menjalankan Test
 
 ```bash
 # Backend (34 tests)
@@ -72,7 +72,7 @@ cd frontend && npm run test
 
 ---
 
-## 📚 API Endpoints
+##  API Endpoints
 
 ### Authentication
 | Method | Endpoint | Deskripsi |
@@ -101,7 +101,7 @@ cd frontend && npm run test
 
 ---
 
-## 🧮 Sistem Gamifikasi
+##  Sistem Gamifikasi
 
 ### XP Formula
 XP untuk mencapai level N: **`50 × N × (N-1)`**
@@ -126,7 +126,7 @@ Berdasarkan 4 kriteria: total XP, level, streak, dan jumlah quest selesai. Otoma
 
 ---
 
-## 📂 Struktur Proyek
+##  Struktur Proyek
 
 ```
 mindquest/
@@ -156,7 +156,7 @@ mindquest/
 
 ---
 
-## 👥 Tim DB11-G006
+##  Tim DB11-G006
 
 | ID Peserta | Nama | Peran |
 |---|---|---|
