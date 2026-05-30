@@ -1,10 +1,9 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS"
-  },
+  "build": {},
   "deploy": {
     "startCommand": "gunicorn config.wsgi --log-file -",
+    "preDeployCommand": "python manage.py migrate && python manage.py seed_quests && python manage.py seed_badges",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
